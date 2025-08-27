@@ -178,7 +178,7 @@ namespace NativeCollections
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Return(ArraySegment<byte> memory)
         {
-            var ptr = _handle + memory.Offset;
+            var ptr = _buffer + memory.Offset;
             if (Unsafe.SizeOf<nint>() == 8)
                 Tlsf64.tlsf_free(_handle, ptr);
             else
