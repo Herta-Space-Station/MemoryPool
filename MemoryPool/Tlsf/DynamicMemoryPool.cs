@@ -45,6 +45,8 @@ namespace NativeCollections
         /// </summary>
         private readonly nuint _blocks;
 
+        ~DynamicMemoryPool() => Dispose();
+
         /// <summary>
         ///     Structure
         /// </summary>

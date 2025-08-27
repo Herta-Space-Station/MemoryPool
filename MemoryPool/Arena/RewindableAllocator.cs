@@ -214,6 +214,8 @@ namespace NativeCollections
         /// </summary>
         private int _version;
 
+        ~RewindableAllocator() => Dispose();
+
         /// <summary>
         ///     Structure
         /// </summary>
