@@ -62,6 +62,15 @@ namespace Examples
             Console.WriteLine("Test: " + ((nint)(Unsafe.AsPointer(ref memory.Array![memory.Offset])) - mem));
             Console.WriteLine();
 
+            var memory1 = memory;
+
+            pool.TryRent(444, out memory);
+            mem = (nint)Unsafe.AsPointer(ref memory.Array![0]);
+            Console.WriteLine("Offset: " + memory.Offset);
+            Console.WriteLine("Size: " + memory.Count);
+            Console.WriteLine("Test: " + ((nint)(Unsafe.AsPointer(ref memory.Array![memory.Offset])) - mem));
+            Console.WriteLine();
+
             pool.Return(memory);
 
             pool.TryRent(444, out memory);
@@ -70,6 +79,9 @@ namespace Examples
             Console.WriteLine("Size: " + memory.Count);
             Console.WriteLine("Test: " + ((nint)(Unsafe.AsPointer(ref memory.Array![memory.Offset])) - mem));
             Console.WriteLine();
+
+            pool.Return(memory);
+            pool.Return(memory1);
 
             pool.TryRent(444, out memory);
             mem = (nint)Unsafe.AsPointer(ref memory.Array![0]);

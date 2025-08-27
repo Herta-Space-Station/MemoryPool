@@ -3,6 +3,8 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading;
 
+// ReSharper disable ALL
+
 namespace NativeCollections
 {
     /// <summary>
@@ -154,7 +156,7 @@ namespace NativeCollections
             /// </summary>
             /// <param name="ptr">Pointer to check.</param>
             /// <returns>True if the pointer is within this block, false otherwise.</returns>
-            public bool Contains(byte[] ptr) => Array == ptr;
+            public bool Contains(nint ptr) => ptr >= Pointer && ptr < Pointer + Union.Current;
         }
 
         /// <summary>
@@ -384,7 +386,7 @@ namespace NativeCollections
         /// </summary>
         /// <param name="ptr">Pointer to memory to free.</param>
         /// <returns>Always returns 0.</returns>
-        private void TryFree(byte[] ptr)
+        private void TryFree(nint ptr)
         {
             if (_enableBlockFree == 0)
                 return;
@@ -414,7 +416,7 @@ namespace NativeCollections
         public bool TryRent(uint length, out ArraySegment<byte> memory)
         {
             var block = new Block();
-            block.Range.Pointer = null;
+            block.Range.Pointer = default;
             block.Range.Items = (int)length;
             block.BytesPerItem = 1;
             block.Alignment = 128;
@@ -435,7 +437,7 @@ namespace NativeCollections
             if (ptr == null)
                 return;
 
-            TryFree(ptr);
+            TryFree(Unsafe.ByteOffset(ref Unsafe.NullRef<byte>(), ref ptr[array.Offset]));
         }
 
         /// <summary>
