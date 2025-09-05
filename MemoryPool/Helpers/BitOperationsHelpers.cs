@@ -49,6 +49,39 @@ namespace NativeCollections
         }
 
         /// <summary>
+        ///     Count the number of trailing zero bits in an integer value
+        ///     Similar in behavior to the x86 instruction TZCNT
+        /// </summary>
+        /// <param name="value">Value</param>
+        /// <returns>Trailing zero count</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int TrailingZeroCount(ulong value)
+        {
+#if NET5_0_OR_GREATER
+            return BitOperations.TrailingZeroCount(value);
+#else
+            var low = (uint)value;
+            return low == 0 ? 32 + TrailingZeroCount((uint)(value >> 32)) : Unsafe.AddByteOffset(ref MemoryMarshal.GetReference(TrailingZeroCountDeBruijn), (nint)(int)(((low & (uint)-(int)low) * 125613361U) >> 27));
+#endif
+        }
+
+        /// <summary>
+        ///     Count the number of trailing zero bits in an integer value
+        ///     Similar in behavior to the x86 instruction TZCNT
+        /// </summary>
+        /// <param name="value">Value</param>
+        /// <returns>Trailing zero count</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int TrailingZeroCount(uint value)
+        {
+#if NET5_0_OR_GREATER
+            return BitOperations.TrailingZeroCount(value);
+#else
+            return value == 0 ? 32 : Unsafe.AddByteOffset(ref MemoryMarshal.GetReference(TrailingZeroCountDeBruijn), (nint)(int)(((value & (uint)-(int)value) * 125613361U) >> 27));
+#endif
+        }
+
+        /// <summary>
         ///     Log2
         /// </summary>
         /// <param name="value">Value</param>
@@ -87,6 +120,17 @@ namespace NativeCollections
         }
 
 #if !NET5_0_OR_GREATER
+        /// <summary>
+        ///     DeBruijn sequence
+        /// </summary>
+        private static ReadOnlySpan<byte> TrailingZeroCountDeBruijn => new byte[32]
+        {
+            0, 1, 28, 2, 29, 14, 24, 3,
+            30, 22, 20, 15, 25, 17, 4, 8,
+            31, 27, 13, 23, 21, 19, 16, 7,
+            26, 12, 18, 6, 11, 5, 10, 9
+        };
+
         /// <summary>
         ///     DeBruijn sequence
         /// </summary>
